@@ -25,11 +25,17 @@
         .shop-name {
             font-size: 1.8rem;
             font-weight: bold;
-            text-shadow: 2px 2px 4px #000;
+            text-shadow: 2px 2px 4px #000; /* เงาสีดำช่วยดันให้สีเหลืองเด่นขึ้น */
             margin-bottom: 20px;
-            background: -webkit-linear-gradient(#FFD700, #BF953F);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            
+            /* --- ส่วนที่แก้ไข: เปลี่ยนเป็นสีเหลืองสว่าง #FFE135 --- */
+            color: #FFE135;  /* Banana Yellow */
+            
+            /* --- ลบส่วนไล่เฉดสีเดิมออกเพื่อให้สีสดชัด --- */
+            /* background: ... (ลบออก) */
+            /* -webkit-background-clip: text; (ลบออก) */
+            /* -webkit-text-fill-color: transparent; (ลบออก) */
+            
             text-align: center;
             padding: 0 10px;
         }
@@ -300,4 +306,5 @@
     </script>
 </body>
 </html>
+
 
