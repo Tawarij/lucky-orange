@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ส้มนำโชค - เสี่ยงทายเลขเด็ด</title>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        /* --- 🎨 ส่วนตกแต่ง (CSS) --- */
+        body {
+            font-family: 'Sarabun', sans-serif;
+            background: linear-gradient(180deg, #8E0E00 0%, #1F1C18 100%);
+            color: #FFD700;
+            margin: 0;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            touch-action: manipulation;
+        }
+
+        /* ชื่อร้าน (หน้าแรก) */
+        .shop-name {
+            font-size: 1.8rem;
+            font-weight: bold;
+            text-shadow: 2px 2px 4px #000;
+            margin-bottom: 20px;
+            background: -webkit-linear-gradient(#FFD700, #BF953F);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-align: center;
+            padding: 0 10px;
+        }
+
+        /* รูปส้ม */
+        .orange-container {
+            font-size: 140px;
+            margin-bottom: 20px;
+            cursor: pointer;
+            filter: drop-shadow(0 0 20px rgba(255, 165, 0, 0.5));
+            user-select: none;
+            transition: transform 0.1s;
+        }
+
+        /* Animation ตอนสั่น */
+        .shaking {
+            animation: shake 0.1s infinite;
+        }
+
+        @keyframes shake {
+            0% { transform: translate(1px, 1px) rotate(0deg); }
+            25% { transform: translate(-3px, 0px) rotate(1deg); }
+            50% { transform: translate(3px, 2px) rotate(-1deg); }
+            75% { transform: translate(-1px, -1px) rotate(1deg); }
+            100% { transform: translate(1px, -2px) rotate(-1deg); }
+        }
+
+        /* ปุ่มกด */
+        .btn-predict {
+            background: linear-gradient(to bottom, #ffeb3b, #fbc02d);
+            border: 4px solid #fff;
+            color: #d32f2f;
+            font-size: 1.5rem;
+            font-weight: bold;
+            padding: 15px 40px;
+            border-radius: 50px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+            outline: none;
+            cursor: pointer;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        .btn-predict:active {
+            transform: scale(0.95);
+        }
+
+        /* กล่องแสดงผล (Modal) */
+        .result-modal {
+            display: none; /* ซ่อนไว้ก่อน */
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.85);
+            z-index: 999;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.3s;
+        }
+
+        .result-content {
+            background: #fff;
+            width: 85%;
+            max-width: 350px;
+            border-radius: 20px;
+            padding: 30px 20px;
+            text-align: center;
+            border: 6px solid #FFD700;
+            box-shadow: 0 0 40px rgba(255, 215, 0, 0.6);
+            position: relative;
+        }
+
+        /* ชื่อร้านในกล่องผลลัพธ์ (เพิ่มใหม่) */
+        .modal-shop-name {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #d32f2f;
+            margin-bottom: 10px;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 10px;
+        }
+
+        .result-number {
+            font-size: 6rem;
+            font-weight: bold;
+            color: #d32f2f;
+            margin: 5px 0;
+            line-height: 1;
+            text-shadow: 2px 2px 0px rgba(0,0,0,0.1);
+        }
+
+        .result-text {
+            color: #555;
+            font-size: 1.2rem;
+            margin-bottom: 25px;
+            font-weight: bold;
+        }
+
+        .close-btn {
+            background: #d32f2f;
+            color: white;
+            border: none;
+            padding: 12px 40px;
+            font-size: 1.2rem;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.8); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        .footer-text {
+            position: absolute;
+            bottom: 20px;
+            font-size: 0.8rem;
+            opacity: 0.6;
+            color: #fff;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="shop-name" id="shopNameDisplay">--</div>
+
+    <div class="orange-container" id="orange">🍊</div>
+
+    <button class="btn-predict" id="predictBtn">กดค้างเพื่อเสี่ยงทาย</button>
+
+    <div class="result-modal" id="resultModal">
+        <div class="result-content">
+            <div class="modal-shop-name" id="shopNameModal">--</div>
+            
+            <div style="font-size: 1rem; color: #888;">เลขนำโชคของคุณ</div>
+            <div class="result-number" id="luckyNumber">--</div>
+            <div class="result-text" id="luckyText">--</div>
+            
+            <button class="close-btn" id="closeBtn">รับพร (ปิด)</button>
+        </div>
+    </div>
+
+    <div class="footer-text">Som-Heng by Risk Hunter</div>
+
+    <script>
+        // ==========================================
+        // 🔧 โซนตั้งค่า (แก้ไขตรงนี้)
+        // ==========================================
+        const CONFIG_SHOP_NAME = "ร้านผลไม้นำโชค (นวลจันทร์ 19)"; 
+        
+        // เลขล็อค (ถ้าอยากเชียร์เลขไหนใส่เลย)
+        const CONFIG_MANUAL_NUMBERS = ["32", "89", "08", "16"];
+        
+        // โอกาสออกเลขล็อค (30%)
+        const CONFIG_MAGIC_CHANCE = 30; 
+        // ==========================================
+
+        // Update ชื่อร้านทั้ง 2 จุด
+        document.getElementById('shopNameDisplay').innerText = CONFIG_SHOP_NAME;
+        document.getElementById('shopNameModal').innerText = CONFIG_SHOP_NAME;
+
+        // --- ระบบเสียง ---
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        let shakeInterval;
+
+        function playShakeSound() {
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            const osc = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+            osc.type = 'square';
+            osc.frequency.setValueAtTime(150, audioCtx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(40, audioCtx.currentTime + 0.1);
+            gainNode.gain.setValueAtTime(0.3, audioCtx.currentTime); // ลดเสียงลงหน่อย
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
+            osc.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.1);
+        }
+
+        // --- ระบบสุ่มตัวเลข ---
+        function getPowerDayNumbers() {
+            // ... (Logic เดิม: หาเลขตามวัน) ...
+            const today = new Date();
+            let targetDate = new Date();
+            if (today.getDate() >= 1 && today.getDate() < 16) {
+                targetDate.setDate(16);
+            } else {
+                targetDate.setMonth(targetDate.getMonth() + 1);
+                targetDate.setDate(1);
+            }
+            const dayOfWeek = targetDate.getDay();
+            const powerMap = {
+                0: ['14', '18', '60', '06'], 1: ['15', '29', '92', '02'],
+                2: ['30', '05', '53', '38'], 3: ['48', '82', '24', '17'],
+                4: ['51', '19', '95', '59'], 5: ['63', '36', '61', '21'],
+                6: ['74', '47', '70', '10']
+            };
+            return powerMap[dayOfWeek] || ['99', '88'];
+        }
+
+        function generateLuckyNumber() {
+            const chance = Math.floor(Math.random() * 100);
+            if (chance < CONFIG_MAGIC_CHANCE) {
+                const pool = [...CONFIG_MANUAL_NUMBERS, ...getPowerDayNumbers()];
+                return pool[Math.floor(Math.random() * pool.length)];
+            } else {
+                return Math.floor(Math.random() * 100).toString().padStart(2, '0');
+            }
+        }
+
+        // --- Interaction ---
+        const btn = document.getElementById('predictBtn');
+        const orange = document.getElementById('orange');
+        const modal = document.getElementById('resultModal');
+        const closeBtn = document.getElementById('closeBtn');
+        let isPressing = false;
+
+        function startPress(e) {
+            e.preventDefault(); 
+            isPressing = true;
+            orange.classList.add('shaking');
+            btn.style.transform = "scale(0.95)";
+            btn.innerText = "กำลังเขย่า..."; // เปลี่ยนข้อความให้รู้ว่ากดอยู่
+            
+            playShakeSound();
+            shakeInterval = setInterval(() => {
+                if(isPressing) playShakeSound();
+            }, 150);
+        }
+
+        function endPress(e) {
+            if (!isPressing) return;
+            isPressing = false;
+            
+            orange.classList.remove('shaking');
+            btn.style.transform = "scale(1)";
+            btn.innerText = "กดค้างเพื่อเสี่ยงทาย"; // คืนค่าข้อความ
+            clearInterval(shakeInterval);
+
+            // แสดงผล
+            const finalNumber = generateLuckyNumber();
+            document.getElementById('luckyNumber').innerText = finalNumber;
+            
+            const blessings = ["งวดนี้มาแน่!", "รับทรัพย์ก้อนโต", "เศรษฐีใหม่", "ดวงกำลังเฮง!", "ปังมากแม่!"];
+            document.getElementById('luckyText').innerText = blessings[Math.floor(Math.random() * blessings.length)];
+
+            // เปิด Modal
+            modal.style.display = 'flex';
+        }
+
+        // Event Listeners สำหรับปุ่มกดเสี่ยงทาย
+        btn.addEventListener('mousedown', startPress);
+        btn.addEventListener('mouseup', endPress);
+        btn.addEventListener('mouseleave', endPress);
+        btn.addEventListener('touchstart', startPress);
+        btn.addEventListener('touchend', endPress);
+
+        // Event Listener สำหรับปุ่มปิด (แก้ไขใหม่ให้ชัวร์)
+        closeBtn.addEventListener('click', function() {
+            modal.style.display = 'none';
+        });
+
+    </script>
+</body>
+</html>
